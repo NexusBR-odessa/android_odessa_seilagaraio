@@ -22,7 +22,7 @@ jobs:
       - name: 🧱 Init & Sync sources
         run: |
           cd los
-          repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
+          repo init -u https://github.com/LineageOS/android.git -b lineage-22.2
           repo sync -j$(nproc) --force-sync
 
       - name: 🧩 Copiar device/vendor/kernel
