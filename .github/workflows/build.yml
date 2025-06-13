@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🛠️ Set up environment
         run: |
@@ -42,7 +42,7 @@ jobs:
           make bacon -j$(nproc)
 
       - name: 📤 Upload ROM zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lineage-22-odessa
           path: los/out/target/product/odessa/*.zip
