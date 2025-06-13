@@ -16,30 +16,36 @@ jobs:
           sudo apt update
           sudo apt install -y bc bison build-essential ccache curl flex git gnupg gperf libncurses5-dev libssl-dev zlib1g-dev liblz4-tool imagemagick libxml2-utils xsltproc unzip repo python-is-python3 openjdk-17-jdk
 
-      - name: ⏬ Repo init e sync
+      - name: 📂 Criar diretório do projeto
+        run: mkdir -p los
+
+      - name: 🧱 Init & Sync sources
         run: |
-          mkdir los && cd los
+          cd los
           repo init -u https://github.com/LineageOS/android.git -b lineage-22
           repo sync -j$(nproc) --force-sync
 
-      - name: 🔀 Copiar device, vendor e kernel
+      - name: 🧩 Copiar device/vendor/kernel
         run: |
-          cd los
-          mkdir -p device/motorola/odessa vendor/motorola/odessa kernel/motorola/odessa
-          cp -r $GITHUB_WORKSPACE/device/motorola/odessa/* device/motorola/odessa/
-          cp -r $GITHUB_WORKSPACE/vendor/motorola/odessa/* vendor/motorola/odessa/
-          cp -r $GITHUB_WORKSPACE/kernel/motorola/odessa/* kernel/motorola/odessa/
+          cp -r $GITHUB_WORKSPACE/device   los/device
+          cp -r $GITHUB_WORKSPACE/vendor   los/vendor
+          cp -r $GITHUB_WORKSPACE/kernel   los/kernel
 
-      - name: ⚙️ Set environment variables
+      - name: 🧠 Adicionar script de build
         run: |
-          cd los
+          cat << 'EOF' > los/build.sh
+          #!/bin/bash
+          set -e
           source build/envsetup.sh
           lunch lineage_odessa-userdebug
+          make bacon -j$(nproc)
+          EOF
+          chmod +x los/build.sh
 
-      - name: 🏗️ Start build
+      - name: 🏗️ Build ROM
         run: |
           cd los
-          make bacon -j$(nproc)
+          ./build.sh
 
       - name: 📤 Upload ROM zip
         uses: actions/upload-artifact@v4
